@@ -1,3 +1,5 @@
+use super::schema::product_categories;
+
 #[derive(Queryable)]
 pub struct Brand {
     pub id: i32,
@@ -18,4 +20,10 @@ pub struct Product {
     pub category_id: i32,
     pub brand_id: i32,
     pub photo_path: Option<String>,
+}
+
+#[derive(Insertable)]
+#[table_name="product_categories"]
+pub struct NewProductCategory<'a> {
+    pub name: &'a str,
 }
