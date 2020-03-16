@@ -8,8 +8,9 @@ use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 use dotenv::dotenv;
 
-pub mod schema;
 pub mod models;
+pub mod schema;
+pub mod services;
 
 pub fn establish_connection() -> SqliteConnection {
     dotenv().ok();

@@ -8,19 +8,28 @@ pub struct ProductCategoryService {
 }
 
 impl ProductCategoryService {
-    fn create(&self, product_category: NewProductCategory) -> ProductCategory {
+    fn create(&self, product_category: NewProductCategory) {
+        use super::schema::product_categories;
+
         diesel::insert_into(product_categories::table)
             .values(&product_category)
-            .get_result(&self.conn)
-            .expect("Error saving new product category")
+            .execute(&self.conn)
+            .expect("Error creating product category");
     }
 
-    fn list(&self, limit: Option<int32>, offset: Option<int32>) -> Vec<ProductCategory> {
+    fn list(&self, limit: Option<i64>, offset: Option<i64>) -> Vec<ProductCategory> {
+        use super::schema::product_categories::dsl::*;
+
         let limit = limit.unwrap_or(100);
         let offset = offset.unwrap_or(0);
-        product_categories
-            .limit(limit)
+        product_categories.limit(limit)
             .offset(offset)
             .load::<ProductCategory>(&self.conn)
+            .expect("Error listing product categories")
     }
+}
+
+#[test]
+fn my_test() {
+    assert!(true);
 }
