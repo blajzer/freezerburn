@@ -24,6 +24,6 @@ pub struct Product {
 
 #[derive(Insertable)]
 #[table_name="product_categories"]
-pub struct NewProductCategory<'a> {
-    pub name: &'a str,
+pub struct NewProductCategory {
+    pub name: String,
 }
