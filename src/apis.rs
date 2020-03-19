@@ -34,9 +34,12 @@ pub async fn list_product_categories() -> impl Responder {
 pub async fn create_product_category(payload: web::Json<CreateRequestPayload>) -> impl Responder {
     let conn = establish_connection();
     let service = ProductCategoryService{conn};
-    service.create(&payload.name);
+    let result = service.create(&payload.name);
 
-    HttpResponse::Created()
+    match result {
+        Ok(_) => HttpResponse::Created(),
+        Err(_) => HttpResponse::UnprocessableEntity()
+    }
 }
 
 #[delete("/api/productCategories/{productCategoryId}/")]

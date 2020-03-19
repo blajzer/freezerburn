@@ -10,17 +10,27 @@ pub struct NewProductCategory {
     pub name: String,
 }
 
+pub struct ProductCategoryCreationError {
+    message: String,
+}
+
+impl From<diesel::result::Error> for ProductCategoryCreationError {
+    fn from(error: diesel::result::Error) -> Self {
+        ProductCategoryCreationError{message: error.to_string()}
+    }
+}
+
 pub struct ProductCategoryService {
     pub conn: SqliteConnection,
 }
 
 impl ProductCategoryService {
-    pub fn create(&self, name: &String) {
+    pub fn create(&self, name: &String) -> Result<(), ProductCategoryCreationError> {
         let product_category = NewProductCategory{ name: name.clone() };
         diesel::insert_into(product_categories::table)
             .values(&product_category)
-            .execute(&self.conn)
-            .expect("Error creating product category");
+            .execute(&self.conn)?;
+        Ok(())
     }
 
     pub fn list(&self, limit: Option<i32>, offset: Option<i32>) -> Vec<ProductCategory> {
