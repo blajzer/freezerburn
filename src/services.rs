@@ -2,35 +2,50 @@ use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 
 use super::models::*;
+use super::schema::product_categories;
+
+#[derive(Insertable)]
+#[table_name="product_categories"]
+pub struct NewProductCategory {
+    pub name: String,
+}
+
+pub struct ProductCategoryCreationError {
+    message: String,
+}
+
+impl From<diesel::result::Error> for ProductCategoryCreationError {
+    fn from(error: diesel::result::Error) -> Self {
+        ProductCategoryCreationError{message: error.to_string()}
+    }
+}
 
 pub struct ProductCategoryService {
-    conn: SqliteConnection,
+    pub conn: SqliteConnection,
 }
 
 impl ProductCategoryService {
-    fn create(&self, name: &String) {
-        use crate::schema::product_categories;
-
+    pub fn create(&self, name: &String) -> Result<(), ProductCategoryCreationError> {
         let product_category = NewProductCategory{ name: name.clone() };
         diesel::insert_into(product_categories::table)
             .values(&product_category)
-            .execute(&self.conn)
-            .expect("Error creating product category");
+            .execute(&self.conn)?;
+        Ok(())
     }
 
-    fn list(&self, limit: Option<i64>, offset: Option<i64>) -> Vec<ProductCategory> {
+    pub fn list(&self, limit: Option<i32>, offset: Option<i32>) -> Vec<ProductCategory> {
         use super::schema::product_categories::dsl::*;
 
         let limit = limit.unwrap_or(100);
         let offset = offset.unwrap_or(0);
         product_categories
-            .limit(limit)
-            .offset(offset)
+            .limit(limit as i64)
+            .offset(offset as i64)
             .load::<ProductCategory>(&self.conn)
             .expect("Error listing product categories")
     }
 
-    fn update(&self, id: i32, new_name: &String) {
+    pub fn update(&self, _id: i32, new_name: &String) {
         use crate::schema::product_categories::dsl::*;
 
         diesel::update(product_categories.find(id))
@@ -39,7 +54,7 @@ impl ProductCategoryService {
             .expect("Error update product category name");
     }
 
-    fn delete(&self, id: i32) {
+    pub fn delete(&self, _id: i32) {
         use crate::schema::product_categories::dsl::*;
 
         diesel::delete(product_categories.find(id))
@@ -47,6 +62,7 @@ impl ProductCategoryService {
             .expect("Error delete product category");
     }
 
+    #[allow(dead_code)]
     fn delete_all(&self) {
         use crate::schema::product_categories::dsl::*;
 

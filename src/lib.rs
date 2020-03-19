@@ -8,6 +8,7 @@ use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 use dotenv::dotenv;
 
+pub mod apis;
 pub mod models;
 pub mod schema;
 pub mod services;

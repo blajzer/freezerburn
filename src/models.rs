@@ -1,4 +1,4 @@
-use super::schema::product_categories;
+use serde;
 
 #[derive(Queryable)]
 pub struct Brand {
@@ -6,7 +6,7 @@ pub struct Brand {
     pub name: String,
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, serde::Serialize)]
 pub struct ProductCategory {
     pub id: i32,
     pub name: String,
@@ -20,10 +20,4 @@ pub struct Product {
     pub category_id: i32,
     pub brand_id: i32,
     pub photo_path: Option<String>,
-}
-
-#[derive(Insertable)]
-#[table_name="product_categories"]
-pub struct NewProductCategory {
-    pub name: String,
 }
